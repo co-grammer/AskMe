@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "Register";
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h1>Registration</h1>
+        @*novalidate="novalidate" => to disable HTML5 validation*@
+        @*class="needs-validation" => user defined class to use bootstrap validation*@
+        <form novalidate="novalidate" action="/account/register" method="post" class="needs-validation">            
+            @Html.AntiForgeryToken()
+            <div class="form-row">
+                <div class="form-group col-sm-12">
+                    <label for="txtName">Name</label>
+                    <input type="text" class="form-control" id="txtName" name="Name" placeholder="Enter name" required="required" pattern="^[a-zA-Z ]*$" autofocus="autofocus" />
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Please enter name [alphabets only]
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-sm-6">
+                    <label for="txtEmail">Email</label>
+                    <input type="email" class="form-control" id="txtEmail" name="Email" placeholder="Enter email" required="required" />
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Invalid email
+                    </div>
+                    <div class="email-exist text-danger"></div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label for="txtMobile">Mobile</label>
+                    @*pattern "^[789]\{9}" => meaning first digit can be 7 or 8 or 9 and followed by 9 digits (Indian Mobile Nos. Pattern)*@
+                    <input type="text" class="form-control" id="txtMobile" name="Mobile" placeholder="Enter Mobile No." required="required" pattern="^[789]\d{9}" />
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Invalid moble number
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-sm-6">
+                    <label for="txtPassword">Password</label>
+                    @*escapeRegExp(this.value) => user-defined function*@
+                    <input type="password" class="form-control" id="txtPassword" name="Password" placeholder="Enter password" required="required" minlength="6" oninput="form.ConfirmPassword.pattern = escapeRegExp(this.value)" />
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Password must contain at least 6 characters.
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label for="txtConfirmPassword">Confirm Password</label>
+                    <input type="password" class="form-control" id="txtConfirmPassword" name="ConfirmPassword" placeholder="Enter confirm password" required="required" />
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Password and Confirm Password do not match.
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    @* the following code will enable the bootstrap validation *@
+    //the meaning of following line is, on submitting the document with the form having class needs-validation call validate() before submit
+    $(document).on("submit", ".needs-validation", validate);
+    //the meaning of below line is, any input element with class needs-validation, after typing the value on that input element and press the tab key then it will(.blur) call validate function
+    $(".needs-validation input").blur(validate);
+    function validate() {
+        //checkValidity() => pre-defined function in bootstrap
+        // if checkValidity() returns false or entered email is already their in the database then prevent, we'hv to stop submitting the form
+        if ($(".needs-validation")[0].checkValidity() == false || $(".email-exist").text() != "") {
+            event.preventDefault();
+        }
+        $(".needs-validation")[0].classList.add("was-validated");
+    }
+    @* the above code will enable the bootstrap validation *@
+
+    function escapeRegExp(str)
+    {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    }
+
+    $("a[href='/account/register']").attr("id", "active");
+
+    @* Below is the ajax web service call to check whether the email is already there in the database *@
+    $("#txtEmail").blur(function () {
+        $.ajax({
+            url: "/api/account?email=" + $("#txtEmail").val(), type: "GET",
+            success: function (response) {
+                if (response == "Not Found") {
+                    $(".email-exist").text("");
+                    $(".email-exist").parent(".form-group").find(".valid-feedback").css("color", "#28a745");
+                }
+                else {
+                    $(".email-exist").text("Email already registered");
+                    $(".email-exist").parent(".form-group").find(".valid-feedback").css("color", "white");
+                }
+            }, 
+            error: function() {
+
+            }
+        });
+    });
+</script>

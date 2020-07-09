@@ -1,0 +1,54 @@
+﻿@model StackOverflowProject.ViewModels.LoginViewModel
+
+@{ 
+    ViewBag.Title = "Login";
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="mx-auto login-box" style="width:600px">
+            <h4>Login</h4>
+            <form action="/account/login" method="post" class="needs-validation" novalidate="novalidate">
+                @Html.AntiForgeryToken()
+                <div class="form-group mr-3">
+                    <label for="email" class="mr-1">Email</label>
+                    <input type="email" class="form-control" id="email" name="Email" required="required" autofocus="autofocus" value="@Model.Email" />
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">Invalid email</div>
+                </div>
+
+                <div class="form-group mr-3">
+                    <label for="pwd">Password</label>
+                    <input type="password" class="form-control" id="pwd" name="Password" required="required" value="@Model.Password" minlength="6" />
+                    <div class="valid-feedback">Looks good!</div>
+                    <div class="invalid-feedback">Password must contain at least 6 characters</div>
+                </div>
+
+                <button type="submit" class="btn btn-success">Login</button>
+
+                <div class="text-danger">
+                    @Html.ValidationSummary()
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("a[href='/account/login']").attr("id", "active");
+
+    @* the following code will enable the bootstrap validation *@
+    //the meaning of following line is, on submitting the document with the form having class needs-validation call validate() before submit
+    $(document).on("submit", ".needs-validation", validate);
+    //the meaning of below line is, any input element with class needs-validation, after typing the value on that input element and press the tab key then it will(.blur) call validate function
+    $(".needs-validation input").blur(validate);
+    function validate() {
+        //checkValidity() => pre-defined function in bootstrap
+        // if checkValidity() returns false or entered email is already their in the database then prevent, we'hv to stop submitting the form
+        if ($(".needs-validation")[0].checkValidity() == false) {
+            event.preventDefault();
+        }
+        $(".needs-validation")[0].classList.add("was-validated");
+    }
+    @* the above code will enable the bootstrap validation *@
+</script>

@@ -1,0 +1,69 @@
+﻿@model StackOverflowProject.ViewModels.EditUserDetailsViewModel
+
+@{
+    ViewBag.Title = "Change Profile";
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h1>Change Profile</h1>
+        @*novalidate="novalidate" => to disable HTML5 validation*@
+        @*class="needs-validation" => user defined class to use bootstrap validation*@
+        <form novalidate="novalidate" action="/account/changeprofile" method="post" class="needs-validation">            
+            @Html.AntiForgeryToken()
+            <div class="form-row">
+                <div class="form-group col-sm-12">
+                    <label for="txtName">Name</label>
+                    <input type="text" class="form-control" id="txtName" name="Name" placeholder="Enter name" required="required" pattern="^[a-zA-Z ]*$" autofocus="autofocus" value="@Model.Name" />
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Please enter name [alphabets only]
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-sm-6">
+                    <label for="txtEmail">Email</label>
+                    @Html.HiddenFor(temp => temp.Email)
+                    <span>@Model.Email</span>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label for="txtMobile">Mobile</label>
+                    @*pattern "^[789]\{9}" => meaning first digit can be 7 or 8 or 9 and followed by 9 digits (Indian Mobile Nos. Pattern)*@
+                    <input type="text" class="form-control" id="txtMobile" name="Mobile" placeholder="Enter Mobile No." required="required" pattern="^[789]\d{9}" value="@Model.Mobile" />
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Invalid moble number
+                    </div>
+                </div>
+            </div>            
+
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    @* the following code will enable the bootstrap validation *@
+    //the meaning of following line is, on submitting the document with the form having class needs-validation call validate() before submit
+    $(document).on("submit", ".needs-validation", validate);
+    //the meaning of below line is, any input element with class needs-validation, after typing the value on that input element and press the tab key then it will(.blur) call validate function
+    $(".needs-validation input").blur(validate);
+    function validate() {
+        //checkValidity() => pre-defined function in bootstrap
+        // if checkValidity() returns false or entered email is already their in the database then prevent, we'hv to stop submitting the form
+        if ($(".needs-validation")[0].checkValidity() == false) {
+            event.preventDefault();
+        }
+        $(".needs-validation")[0].classList.add("was-validated");
+    }
+    @* the above code will enable the bootstrap validation *@    
+
+    $("a[href='/account/changeprofile']").attr("id", "active");    
+</script>
